@@ -1,0 +1,12 @@
+DerivedData/
+build/
+*.xcarchive
+*.ipa
+*.xcuserstate
+xcuserdata/
+*.mobileprovision
+*.p12
+*.cer
+*.log
+.env
+.env.*
