@@ -15,9 +15,9 @@ final class LumaModel: ObservableObject {
     private var client: CoordinatorClient?
 
     func connect() { run { let client = CoordinatorClient(settings: self.settings); self.progress = try await client.status(); self.plan = try? await client.plan(); self.client = client; self.connected = true; self.message = "Connected to the trusted LumaSift coordinator." } }
-    func refresh() { run { guard let client else { throw CoordinatorError.emptyPayload }; self.progress = try await client.status(); self.plan = try? await client.plan() } }
-    func start() { run { guard let client else { throw CoordinatorError.emptyPayload }; guard !self.selected.isEmpty else { throw CoordinatorError.emptyPayload }; self.progress = try await client.start(self.selected.sorted()); self.plan = nil; self.message = "The Windows coordinator is building a review-only exact-content plan." } }
-    func apply() { run { guard let client, let plan else { throw CoordinatorError.emptyPayload }; self.plan = try await client.apply(plan.id); self.progress = try await client.status(); self.message = "The coordinator revalidated and applied the approved quarantine plan." } }
+    func refresh() { run { guard let client = self.client else { throw CoordinatorError.emptyPayload }; self.progress = try await client.status(); self.plan = try? await client.plan() } }
+    func start() { run { guard let client = self.client else { throw CoordinatorError.emptyPayload }; guard !self.selected.isEmpty else { throw CoordinatorError.emptyPayload }; self.progress = try await client.start(self.selected.sorted()); self.plan = nil; self.message = "The Windows coordinator is building a review-only exact-content plan." } }
+    func apply() { run { guard let client = self.client, let plan = self.plan else { throw CoordinatorError.emptyPayload }; self.plan = try await client.apply(plan.id); self.progress = try await client.status(); self.message = "The coordinator revalidated and applied the approved quarantine plan." } }
     private func run(_ operation: @escaping () async throws -> Void) { working = true; message = nil; Task { defer { working = false }; do { try await operation() } catch { message = error.localizedDescription } } }
 }
 
